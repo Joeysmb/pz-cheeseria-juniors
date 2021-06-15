@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 // Components
+import Iteme from './Cart/Item/Iteme';
 import Item from './Cart/Item/Item';
 import Cart from './Cart/Cart';
 import Drawer from '@material-ui/core/Drawer';
@@ -9,6 +10,9 @@ import Grid from '@material-ui/core/Grid';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import RestoreIcon from '@material-ui/icons/Restore';
 import Badge from '@material-ui/core/Badge';
+import Popup from './Cart/Item/Popup';
+
+ 
 // Styles
 import { Wrapper, StyledButton, StyledAppBar, HeaderTypography } from './App.styles';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
@@ -22,28 +26,40 @@ export type CartItemType = {
   title: string;
   amount: number;
 };
-
-
+ 
+ 
 const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
-
+ 
 const App = () => {
+    var [popUpItem, setpopUpitem] = useState<CartItemType>({
+        id: 99,
+        category: "Brazilian Cheese",
+        description: "You gotta love it",
+        image: "https://www.cheese.com/media/img/cheese/Abbaye-de-Belloc.jpg",
+        price: 20,
+        title: "No Title",
+        amount: 3
+      });
   const [cartOpen, setCartOpen] = useState(false);
+  const [openPopup, setOpenPopup] = useState(false);
   const [cartItems, setCartItems] = useState([] as CartItemType[]);
   const { data, isLoading, error } = useQuery<CartItemType[]>(
     'cheeses',
     getCheeses
   );
-  console.log(data);
-
+  //console.log(data);
+ 
+  
+ 
   const getTotalItems = (items: CartItemType[]) =>
     items.reduce((ack: number, item) => ack + item.amount, 0);
-
+ 
   const handleAddToCart = (clickedItem: CartItemType) => {
     setCartItems(prev => {
       // 1. Is the item already added in the cart?
       const isItemInCart = prev.find(item => item.id === clickedItem.id);
-
+ 
       if (isItemInCart) {
         return prev.map(item =>
           item.id === clickedItem.id
@@ -55,7 +71,7 @@ const App = () => {
       return [...prev, { ...clickedItem, amount: 1 }];
     });
   };
-
+ 
   const handleRemoveFromCart = (id: number) => {
     setCartItems(prev =>
       prev.reduce((ack, item) => {
@@ -68,12 +84,21 @@ const App = () => {
       }, [] as CartItemType[])
     );
   };
-
+ 
+ 
+  const setId = (clickedItem:CartItemType) => { 
+    setpopUpitem(popUpItem = clickedItem)
+    setOpenPopup(true);
+    
+    console.log("Setid was triggered")
+    console.log(clickedItem)
+  }
+ 
   if (isLoading) return <LinearProgress />;
   if (error) return <div>Something went wrong ...</div>;
-
+ 
   return (
-
+ 
     <Wrapper>
       <StyledAppBar position="static">
         <Toolbar>
@@ -89,11 +114,11 @@ const App = () => {
                 Recent Purchases
               </Typography>
             </StyledButton>
-
+ 
             <HeaderTypography variant="h3" noWrap>
               Welcome to Patient Zero's Cheeseria
             </HeaderTypography>
-
+ 
             <StyledButton onClick={() => setCartOpen(true)}>
               <Badge
                 badgeContent={getTotalItems(cartItems)}
@@ -101,16 +126,16 @@ const App = () => {
                 data-cy="badge-count">
                 <AddShoppingCartIcon />
               </Badge>
-
+ 
               <Typography variant="subtitle2">
                 Cart
               </Typography>
             </StyledButton>
-
+ 
           </Grid>
         </Toolbar>
       </StyledAppBar>
-
+ 
       <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
         <Cart
           cartItems={cartItems}
@@ -118,17 +143,28 @@ const App = () => {
           removeFromCart={handleRemoveFromCart}
         />
       </Drawer>
-
+ 
       <Grid container spacing={3}>
         {data?.map(item => (
-          <Grid item key={item.id} xs={12} sm={4}>
-            <Item item={item} handleAddToCart={handleAddToCart} />
+          <Grid item key={item.id} xs={12} sm={4} /* added onClick={setId(item)} */> 
+            <Item item={item} handleAddToCart={handleAddToCart} setId={setId} />
+            <Popup
+              openPopup = {openPopup}
+              setOpenPopup = {setOpenPopup}
+              popUpItem = {popUpItem}
+               
+            >
+              {/* <Item item = {popUpItem} handleAddToCart = {handleAddToCart} setId={setId}/> */}
+              {/* <div> Description: {popUpItem.description}</div> */}
+            </Popup>
           </Grid>
         ))}
       </Grid>
     </Wrapper>
-
+ 
   );
 };
-
+ 
 export default App;
+ 
+
