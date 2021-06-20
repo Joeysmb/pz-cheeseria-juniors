@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 // Components
-import Iteme from './Cart/Item/Iteme';
+// import Iteme from './Cart/Item/Iteme';
 import Item from './Cart/Item/Item';
 import Cart from './Cart/Cart';
 import Drawer from '@material-ui/core/Drawer';
@@ -76,7 +76,9 @@ const App = () => {
     setCartItems(prev =>
       prev.reduce((ack, item) => {
         if (item.id === id) {
-          if (item.amount === 1) return ack;
+          if (item.amount === 1) {
+              return ack;
+            }
           return [...ack, { ...item, amount: item.amount - 1 }];
         } else {
           return [...ack, item];
@@ -85,6 +87,24 @@ const App = () => {
     );
   };
  
+  const storePurchasedItems = async (purchasedItems: CartItemType[]) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(purchasedItems)
+    };
+    // console.log(cartItems)
+    try {
+      const responseStream = await fetch("/api/store", requestOptions);
+      const jsonResponse = await responseStream.json()
+      console.log(jsonResponse)
+      setCartItems([]);
+    } catch (error) {
+      console.log("Something went wrong, check out was unsuccessful: " + error);
+    }  
+  };
  
   const setId = (clickedItem:CartItemType) => { 
     setpopUpitem(popUpItem = clickedItem)
@@ -92,7 +112,7 @@ const App = () => {
     
     console.log("Setid was triggered")
     console.log(clickedItem)
-  }
+  };
  
   if (isLoading) return <LinearProgress />;
   if (error) return <div>Something went wrong ...</div>;
@@ -141,6 +161,7 @@ const App = () => {
           cartItems={cartItems}
           addToCart={handleAddToCart}
           removeFromCart={handleRemoveFromCart}
+          storePurchasedItems = {storePurchasedItems}
         />
       </Drawer>
  
