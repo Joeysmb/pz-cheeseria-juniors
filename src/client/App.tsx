@@ -11,6 +11,7 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import RestoreIcon from '@material-ui/icons/Restore';
 import Badge from '@material-ui/core/Badge';
 import Popup from './Cart/Item/Popup';
+import RecentPurchases from "./RecentPurchases/RecentPurchases"
 
  
 // Styles
@@ -41,6 +42,8 @@ const App = () => {
         title: "No Title",
         amount: 3
       });
+  const [purchasesDrawer, setOpenPurchasesDrawer] = useState(false);
+  const [recentlyPurchasedItems, setRecentlyPurchasedItems] = useState([] as CartItemType[]);
   const [cartOpen, setCartOpen] = useState(false);
   const [openPopup, setOpenPopup] = useState(false);
   const [cartItems, setCartItems] = useState([] as CartItemType[]);
@@ -97,14 +100,26 @@ const App = () => {
     };
     // console.log(cartItems)
     try {
-      const responseStream = await fetch("/api/store", requestOptions);
+      const responseStream = await fetch("/api/storeCheckout", requestOptions);
       const jsonResponse = await responseStream.json()
       console.log(jsonResponse)
       setCartItems([]);
     } catch (error) {
-      console.log("Something went wrong, check out was unsuccessful: " + error);
+      console.log("Something went wrong, check out was NOT successful: " + error);
     }  
   };
+
+  const getRecentlyPurchasedItems = async () => {
+      try {
+          const responseStream = await fetch('/api/recentlyPurchasedItems');
+          const jsonResponse = await responseStream.json();
+          setRecentlyPurchasedItems(jsonResponse);
+          setOpenPurchasesDrawer(true);
+          console.log(typeof jsonResponse);
+      } catch (error) {
+          console.log(error);
+      }
+  }
  
   const setId = (clickedItem:CartItemType) => { 
     setpopUpitem(popUpItem = clickedItem)
@@ -128,7 +143,7 @@ const App = () => {
             justify="space-between"
             alignItems="center"
           >
-            <StyledButton>
+            <StyledButton onClick={getRecentlyPurchasedItems}>
               <RestoreIcon />
               <Typography variant="subtitle2">
                 Recent Purchases
@@ -164,6 +179,14 @@ const App = () => {
           storePurchasedItems = {storePurchasedItems}
         />
       </Drawer>
+
+      <Drawer anchor='left' open={purchasesDrawer} onClose={() => setOpenPurchasesDrawer(false)}>
+      <RecentPurchases
+        recentPurchases = {recentlyPurchasedItems}
+      >
+
+      </RecentPurchases>
+      </Drawer>
  
       <Grid container spacing={3}>
         {data?.map(item => (
@@ -173,10 +196,9 @@ const App = () => {
               openPopup = {openPopup}
               setOpenPopup = {setOpenPopup}
               popUpItem = {popUpItem}
-               
+        
             >
-              {/* <Item item = {popUpItem} handleAddToCart = {handleAddToCart} setId={setId}/> */}
-              {/* <div> Description: {popUpItem.description}</div> */}
+
             </Popup>
           </Grid>
         ))}
