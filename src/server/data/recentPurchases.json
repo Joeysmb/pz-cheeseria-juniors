@@ -1,23 +1,5 @@
 [
   {
-    "id": 100,
-    "category": "Brazilian Cheese",
-    "description": "You gotta love it",
-    "image": "https://www.cheese.com/media/img/cheese/12-saint-albray-shutterstock_1222710106.jpg",
-    "price": 20,
-    "title": "No Title",
-    "amount": 3
-  },
-  {
-    "id": 101,
-    "category": "Asian Cheese",
-    "description": "Soft and yummy",
-    "image": "https://www.cheese.com/media/img/cheese/12-saint-albray-shutterstock_1222710106.jpg",
-    "price": 20,
-    "title": "No Title",
-    "amount": 3
-  },
-  {
     "id": 6,
     "title": "MAASDAM",
     "price": 140,
@@ -45,21 +27,12 @@
     "amount": 1
   },
   {
-    "id": 2,
-    "title": "ABBAYE DU MONT DES CATS",
-    "price": 29.21,
-    "description": "The Abbaye du Mont des Cats cheese is made by monks in a monastery of the same name in the town of Godewaersvelde, in Northern France. Cow's milk from local farms is used and the milk is gently pasteurised for cheese production. The maturation process takes about 4 to 5 weeks",
-    "category": "semi-soft, artisan, brined",
-    "image": "https://www.cheese.com/media/img/cheese/Mont_des_Cats_kaas.jpg",
-    "amount": 1
-  },
-  {
-    "id": 8,
-    "title": "SAINT ALBRAY",
-    "price": 860.62,
-    "description": "Saint Albray is a flower-shaped cheese that comes from the Aquitaine region of France. Made with pasteurised cow's milk and ripened for 2 weeks, it slices off skilfully with each half-pound cut looking like a \"petal\". When each petal comes together around a disk, they form a hollow centre similar to a flower.",
-    "category": "soft, soft-ripened",
-    "image": "https://www.cheese.com/media/img/cheese/12-saint-albray-shutterstock_1222710106.jpg",
+    "id": 3,
+    "title": "ADELOST",
+    "price": 367.55,
+    "description": "Adelost is a Swedish blue cheese made from cow's milk. The blue-grey veins running throughout are a distinctive feature of the cheese. It has a sharp, salty and tangy flavour. The ripening process is for two to three months. The cheese comes in a drum shape with a rind of pale cream, which is lightly dotted with moulds.",
+    "category": "semi-soft, blue-veined",
+    "image": "https://www.cheese.com/media/img/cheese/Adelost_QnxYLx6.jpg",
     "amount": 1
   }
 ]
