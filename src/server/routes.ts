@@ -53,7 +53,7 @@ app.get('/api/cheeses', (req, res, next) => {
     res.json(cheeses);
 });
 
-app.post("/api/store", (req, res, next) => {
+app.post("/api/storeCheckout", (req, res, next) => {
     let newItems: itemArr = req.body;
     readFile('./src/server/data/recentPurchases.json', "utf-8", (err, oldItems)=>{
         if(err){
@@ -87,15 +87,31 @@ app.post("/api/store", (req, res, next) => {
         } catch (error) {
             console.log("An Error occured ")
         }
-    })
+    });
 
-
-    console.log("Request just hit the server")
+    console.log(" Post Request just hit the server")
     console.log(req.body)
     res.json({
         status: "Successful",
         Message: "Thank you for shopping Cheeseria cheese"
     })
+});
+
+app.get("/api/recentlyPurchasedItems", (req, res, next) => {
+    console.log("Request received nanana")
+    readFile('./src/server/data/recentPurchases.json', "utf-8", (err, data)=>{
+        if(err){
+            console.log(err);
+            return res.json({"error": "Something went wrong. " + err});
+        }
+        try {
+            const recentlyPurchasedItems = JSON.parse(data);
+            console.log(recentlyPurchasedItems);
+            return res.json(recentlyPurchasedItems);
+        } catch (error) {
+            return res.json({"error": "Something went wrong. " + error});
+        }
+    });
 });
 export default app;
 
