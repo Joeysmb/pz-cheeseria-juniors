@@ -3,18 +3,17 @@ import Button from '@material-ui/core/Button';
 import { CartItemType } from '../../App';
 // Styles
 import { Wrapper } from './Item.styles';
-import { useState } from 'react';
+
 
 type Props = {
   item: CartItemType;
   handleAddToCart: (clickedItem: CartItemType) => void;
-  setId: (clickedItem: CartItemType) => void;
+  handleItemDialog: (clickedItem: CartItemType) => void;
 };
-//const [openPopup, setOpenPopup] = useState(false);
 
-const Item: React.FC<Props> = ({ item, handleAddToCart, setId }) => (
+const Item: React.FC<Props> = ({ item, handleAddToCart, handleItemDialog }) => (
   <Wrapper>
-    <div onClick={() => setId(item)}>
+    <div className="popupClickArea" onClick={() => handleItemDialog(item)}>
     <img src={item.image} alt={item.title} />
     <div>
       <h3> {item.title}</h3>
