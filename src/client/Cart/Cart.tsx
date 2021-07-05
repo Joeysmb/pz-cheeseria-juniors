@@ -27,9 +27,13 @@ const Cart: React.FC<Props> = ({ cartItems, addToCart, removeFromCart, storePurc
         />
       ))}
       <h2>Total: ${calculateTotal(cartItems).toFixed(2)}</h2>
-      <Button onClick = {()=> storePurchasedItems(cartItems)} color="primary">
+      
+      {/* Is there any item in the cart? */}
+      {cartItems.length === 0  
+      ? null 
+      : <Button onClick = {()=> storePurchasedItems(cartItems)} color="primary">
         Purchase
-      </Button>
+        </Button>}
     </Wrapper>
   );
 };
