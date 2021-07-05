@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 // Components
-// import Iteme from './Cart/Item/Iteme';
+import ItemDialog from './Cart/Item/ItemDialog';
+import RecentPurchases from "./RecentPurchases/RecentPurchases"
 import Item from './Cart/Item/Item';
 import Cart from './Cart/Cart';
 import Drawer from '@material-ui/core/Drawer';
@@ -10,10 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import RestoreIcon from '@material-ui/icons/Restore';
 import Badge from '@material-ui/core/Badge';
-import Popup from './Cart/Item/Popup';
-import RecentPurchases from "./RecentPurchases/RecentPurchases"
-
- 
 // Styles
 import { Wrapper, StyledButton, StyledAppBar, HeaderTypography } from './App.styles';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
@@ -28,24 +25,16 @@ export type CartItemType = {
   amount: number;
 };
  
- 
+ //Retrieve the items from server for display
 const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
  
 const App = () => {
-    var [popUpItem, setpopUpitem] = useState<CartItemType>({
-        id: 99,
-        category: "Brazilian Cheese",
-        description: "You gotta love it",
-        image: "https://www.cheese.com/media/img/cheese/Abbaye-de-Belloc.jpg",
-        price: 20,
-        title: "No Title",
-        amount: 3
-      });
+  const [dialogItem, setDialogItem] = useState<CartItemType>({} as CartItemType);
   const [purchasesDrawer, setOpenPurchasesDrawer] = useState(false);
   const [recentlyPurchasedItems, setRecentlyPurchasedItems] = useState([] as CartItemType[]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [openPopup, setOpenPopup] = useState(false);
+  const [openItemDialog, setOpenItemDialog] = useState(false);
   const [cartItems, setCartItems] = useState([] as CartItemType[]);
   const { data, isLoading, error } = useQuery<CartItemType[]>(
     'cheeses',
@@ -91,6 +80,7 @@ const App = () => {
   };
  
   const storePurchasedItems = async (purchasedItems: CartItemType[]) => {
+      //Set up the request headers
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -98,35 +88,27 @@ const App = () => {
       },
       body: JSON.stringify(purchasedItems)
     };
-    // console.log(cartItems)
-    try {
+      //Send request to store purchased items on the server 
       const responseStream = await fetch("/api/storeCheckout", requestOptions);
-      const jsonResponse = await responseStream.json()
-      console.log(jsonResponse)
-      setCartItems([]);
-    } catch (error) {
-      console.log("Something went wrong, check out was NOT successful: " + error);
-    }  
+      const jsonResponse = await responseStream.text()
+      console.log(jsonResponse);
+      //Empty the cart
+      setCartItems([]); 
   };
 
   const getRecentlyPurchasedItems = async () => {
-      try {
+          //Get recently purchased items from server
           const responseStream = await fetch('/api/recentlyPurchasedItems');
-          const jsonResponse = await responseStream.json();
-          setRecentlyPurchasedItems(jsonResponse);
+          const recentlyPurchasedItems = await responseStream.json();
+          setRecentlyPurchasedItems(recentlyPurchasedItems);
+          //Open the drawer to display the recently purchased items
           setOpenPurchasesDrawer(true);
-          console.log(typeof jsonResponse);
-      } catch (error) {
-          console.log(error);
-      }
+          console.log(typeof recentlyPurchasedItems);
   }
  
-  const setId = (clickedItem:CartItemType) => { 
-    setpopUpitem(popUpItem = clickedItem)
-    setOpenPopup(true);
-    
-    console.log("Setid was triggered")
-    console.log(clickedItem)
+  const handleItemDialog = (clickedItem:CartItemType) => { 
+    setDialogItem(clickedItem) //Get and set  the clicked item for popup
+    setOpenItemDialog(true); //Open the dialog box
   };
  
   if (isLoading) return <LinearProgress />;
@@ -190,18 +172,18 @@ const App = () => {
  
       <Grid container spacing={3}>
         {data?.map(item => (
-          <Grid item key={item.id} xs={12} sm={4} /* added onClick={setId(item)} */> 
-            <Item item={item} handleAddToCart={handleAddToCart} setId={setId} />
-            <Popup
-              openPopup = {openPopup}
-              setOpenPopup = {setOpenPopup}
-              popUpItem = {popUpItem}
-        
-            >
-
-            </Popup>
+          <Grid item key={item.id} xs={12} sm={4} > 
+            <Item item={item} handleAddToCart={handleAddToCart} handleItemDialog={handleItemDialog} />
+    
           </Grid>
         ))}
+        <ItemDialog
+              openItemDialog = {openItemDialog}
+              setOpenItemDialog = {setOpenItemDialog}
+              dialogItem = {dialogItem}
+            >
+
+            </ItemDialog>
       </Grid>
     </Wrapper>
  
