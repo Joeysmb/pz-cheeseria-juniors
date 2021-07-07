@@ -30,19 +30,18 @@ const getCheeses = async (): Promise<CartItemType[]> =>
   await (await fetch(`api/cheeses`)).json();
  
 const App = () => {
-  const [dialogItem, setDialogItem] = useState<CartItemType>({} as CartItemType);
-  const [purchasesDrawer, setOpenPurchasesDrawer] = useState(false);
-  const [recentlyPurchasedItems, setRecentlyPurchasedItems] = useState([] as CartItemType[]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [openItemDialog, setOpenItemDialog] = useState(false);
-  const [cartItems, setCartItems] = useState([] as CartItemType[]);
-  const { data, isLoading, error } = useQuery<CartItemType[]>(
-    'cheeses',
-    getCheeses
-  );
+    const [checkoutMessage, setcheckoutMessage] = useState<string>("");
+    const [dialogItem, setDialogItem] = useState<CartItemType>({} as CartItemType);
+    const [purchasesDrawer, setOpenPurchasesDrawer] = useState(false);
+    const [recentlyPurchasedItems, setRecentlyPurchasedItems] = useState([] as CartItemType[]);
+    const [cartOpen, setCartOpen] = useState(false);
+    const [openItemDialog, setOpenItemDialog] = useState(false);
+    const [cartItems, setCartItems] = useState([] as CartItemType[]);
+    const { data, isLoading, error } = useQuery<CartItemType[]>(
+        'cheeses',
+        getCheeses
+    );
   //console.log(data);
- 
-  
  
   const getTotalItems = (items: CartItemType[]) =>
     items.reduce((ack: number, item) => ack + item.amount, 0);
@@ -80,6 +79,10 @@ const App = () => {
   };
  
   const storePurchasedItems = async (purchasedItems: CartItemType[]) => {
+      type res = {
+          status: string,
+          message: string
+      }
       //Set up the request headers
     const requestOptions = {
       method: 'POST',
@@ -90,10 +93,15 @@ const App = () => {
     };
       //Send request to store purchased items on the server 
       const responseStream = await fetch("/api/storeCheckout", requestOptions);
-      const jsonResponse = await responseStream.text()
-      console.log(jsonResponse);
-      //Empty the cart
-      setCartItems([]); 
+      const jsonResponse: res = await responseStream.json()
+      if(jsonResponse.status === "Successful"){
+          //Send greeting and Empty the cart after Purchase
+        setcheckoutMessage(jsonResponse.message);
+        setCartItems([]); 
+      }else{
+        setcheckoutMessage(jsonResponse.message);
+      }
+      return;
   };
 
   const getRecentlyPurchasedItems = async () => {
@@ -103,12 +111,18 @@ const App = () => {
           setRecentlyPurchasedItems(recentlyPurchasedItems);
           //Open the drawer to display the recently purchased items
           setOpenPurchasesDrawer(true);
-          console.log(typeof recentlyPurchasedItems);
+          return;
+  }
+
+  const handleOpenCart = () => {
+    setCartOpen(false);
+    setcheckoutMessage('');
   }
  
   const handleItemDialog = (clickedItem:CartItemType) => { 
     setDialogItem(clickedItem) //Get and set  the clicked item for popup
     setOpenItemDialog(true); //Open the dialog box
+    return;
   };
  
   if (isLoading) return <LinearProgress />;
@@ -153,12 +167,13 @@ const App = () => {
         </Toolbar>
       </StyledAppBar>
  
-      <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+      <Drawer anchor='right' open={cartOpen} onClose={handleOpenCart}>
         <Cart
           cartItems={cartItems}
           addToCart={handleAddToCart}
           removeFromCart={handleRemoveFromCart}
           storePurchasedItems = {storePurchasedItems}
+          checkoutMessage = {checkoutMessage}
         />
       </Drawer>
 
