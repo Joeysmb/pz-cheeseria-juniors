@@ -35,8 +35,11 @@ app.post("/api/storeCheckout", (req, res, next) => {
     //Get the stored items
     readFile('./src/server/data/recentPurchases.json', "utf-8", (err, oldItems)=>{
         if(err){
-            res.send("Checkout was not successful")
-            console.log("Unable to read file - ERROR: " + err);
+            res.json({
+                status: "Unsuccessful",
+                message: "Checkout was not successful, please try again later"
+            })
+            console.log(err);
             return err
         }
             //Convert retrieved items to JSON
@@ -62,14 +65,14 @@ app.post("/api/storeCheckout", (req, res, next) => {
             writeFile('./src/server/data/recentPurchases.json', allPurchasedItemsString, (err)=>{
                 if(err){
                     res.json({
-                        status: "Checkout was not successful",
-                        message: err
+                        status: "Unsuccessful",
+                        message: "Checkout was not successful, please try again later"
                     })
-                    console.log("Unable to read file - ERROR: " + err);
+                    console.log(err);
                     return err
                 }else{
                     res.json({
-                        status: "Checkout was Successful",
+                        status: "Successful",
                         message: "Thank you for shopping Cheeseria cheese"
                     })
                 } 
@@ -82,7 +85,7 @@ app.get("/api/recentlyPurchasedItems", (req, res, next) => {
     readFile('./src/server/data/recentPurchases.json', "utf-8", (err, data)=>{
         if(err){
             console.log(err);
-            return res.json({"error": "Something went wrong. " + err});
+            return;
         }
 
             const oldPurchasedItems: purchasesArr = JSON.parse(data);
