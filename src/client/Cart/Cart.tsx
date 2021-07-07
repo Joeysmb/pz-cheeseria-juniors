@@ -8,9 +8,10 @@ type Props = {
   addToCart: (clickedItem: CartItemType) => void;
   removeFromCart: (id: number) => void;
   storePurchasedItems: (purchasedItems: CartItemType[]) => void
+  checkoutMessage: string;
 };
 
-const Cart: React.FC<Props> = ({ cartItems, addToCart, removeFromCart, storePurchasedItems }) => {
+const Cart: React.FC<Props> = ({ cartItems, addToCart, removeFromCart, storePurchasedItems, checkoutMessage }) => {
   const calculateTotal = (items: CartItemType[]) =>
     items.reduce((ack: number, item) => ack + item.amount * item.price, 0);
 
@@ -34,6 +35,7 @@ const Cart: React.FC<Props> = ({ cartItems, addToCart, removeFromCart, storePurc
       : <Button onClick = {()=> storePurchasedItems(cartItems)} color="primary">
         Purchase
         </Button>}
+        <p>{checkoutMessage}</p>
     </Wrapper>
   );
 };
